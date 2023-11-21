@@ -1,0 +1,40 @@
+version: '3.9'
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+  alertmanager-data: {}
+
+services:
+
+  prometheus:	
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+
+  alertmanager:
+    image: prom/alertmanager:v0.23.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - "./alertmanager.yml:/config/alertmanager.yml"
+      - alertmanager-data:/data
+    command: --config.file=/config/alertmanager.yml --log.level=debug
+
+ 
+  node:
+    image: quay.io/prometheus/node-exporter
+    container_name: node-exporter
+    ports:
+      - 9100:9100
+    volumes:
+      - "/:/rootfs"
+
